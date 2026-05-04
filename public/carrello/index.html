@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="it" data-page="carrello">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Carrello — Oleificio Cabriolu</title>
+    <meta name="description"
+        content="Il tuo carrello. Rivedi i prodotti selezionati, modifica le quantità e procedi all'acquisto. Oleificio Cabriolu, Villacidro, Sardegna.">
+    <link rel="canonical" href="https://www.oleificiocabriolu.it/carrello">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#000000">
+    <link rel="preload" href="/fonts/cormorant-garamond-v16-latin-700.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/inter-v13-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+    <main class="cart-page">
+        <div class="cart-page__inner">
+
+            <p class="cart-page__breadcrumb"><a href="/">Home</a> / <a href="/shop">Shop</a> / Carrello</p>
+            <h1 class="cart-page__title">Il Tuo Carrello</h1>
+
+            <!-- STATO VUOTO -->
+            <div class="cart-empty" id="cartEmpty" style="display:none">
+                <p class="cart-empty__icon">&#128722;</p>
+                <p class="cart-empty__text">Il carrello è vuoto.</p>
+                <a href="/shop" class="cart-empty__cta">Esplora lo Shop</a>
+            </div>
+
+            <!-- STATO CON PRODOTTI -->
+            <div class="cart-filled" id="cartFilled" style="display:none">
+
+                <!-- TABELLA PRODOTTI -->
+                <div class="cart-table-wrap">
+                    <table class="cart-table">
+                        <thead>
+                            <tr>
+                                <th class="cart-table__th-product">Prodotto</th>
+                                <th>Formato</th>
+                                <th>Prezzo</th>
+                                <th>Quantità</th>
+                                <th>Totale</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cartBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- RIEPILOGO -->
+                <div class="cart-summary">
+                    <div class="cart-summary__box">
+                        <h2 class="cart-summary__title">Riepilogo Ordine</h2>
+
+                        <div class="cart-summary__row">
+                            <span>Subtotale prodotti</span>
+                            <span id="summarySubtotal">€0,00</span>
+                        </div>
+
+                        <div class="cart-summary__row">
+                            <span>Spedizione</span>
+                            <span id="summaryShipping">—</span>
+                        </div>
+
+                        <p class="cart-summary__shipping-note" id="shippingNote"></p>
+
+                        <div class="cart-summary__divider"></div>
+
+                        <div class="cart-summary__row cart-summary__row--total">
+                            <span>Totale (IVA inclusa)</span>
+                            <span id="summaryTotal">€0,00</span>
+                        </div>
+
+                        <button class="cart-summary__checkout" id="checkoutBtn">Procedi al Checkout</button>
+                        <a href="/shop" class="cart-summary__continue">&#8592; Continua gli acquisti</a>
+                    </div>
+                </div>
+
+                <!-- CHECKOUT FORM (nascosto, appare al click) -->
+                <div class="checkout-form" id="checkoutForm" style="display:none">
+                    <h2 class="checkout-form__title">Dati di Spedizione e Pagamento</h2>
+
+                    <form id="orderForm" novalidate>
+                        <fieldset class="checkout-fieldset">
+                            <legend>Dati Personali</legend>
+                            <div class="checkout-grid">
+                                <div class="checkout-field">
+                                    <label for="cf_nome">Nome *</label>
+                                    <input type="text" id="cf_nome" name="nome" required autocomplete="given-name">
+                                </div>
+                                <div class="checkout-field">
+                                    <label for="cf_cognome">Cognome *</label>
+                                    <input type="text" id="cf_cognome" name="cognome" required
+                                        autocomplete="family-name">
+                                </div>
+                                <div class="checkout-field">
+                                    <label for="cf_email">Email *</label>
+                                    <input type="email" id="cf_email" name="email" required autocomplete="email">
+                                </div>
+                                <div class="checkout-field">
+                                    <label for="cf_telefono">Telefono *</label>
+                                    <input type="tel" id="cf_telefono" name="telefono" required autocomplete="tel">
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="checkout-fieldset">
+                            <legend>Indirizzo di Spedizione</legend>
+                            <div class="checkout-grid">
+                                <div class="checkout-field checkout-field--full">
+                                    <label for="cf_indirizzo">Via e Numero Civico *</label>
+                                    <input type="text" id="cf_indirizzo" name="indirizzo" required
+                                        autocomplete="street-address">
+                                </div>
+                                <div class="checkout-field">
+                                    <label for="cf_citta">Città *</label>
+                                    <input type="text" id="cf_citta" name="citta" required
+                                        autocomplete="address-level2">
+                                </div>
+                                <div class="checkout-field">
+                                    <label for="cf_provincia">Provincia *</label>
+                                    <input type="text" id="cf_provincia" name="provincia" required maxlength="2"
+                                        autocomplete="address-level1" placeholder="es. SU">
+                                </div>
+                                <div class="checkout-field">
+                                    <label for="cf_cap">CAP *</label>
+                                    <input type="text" id="cf_cap" name="cap" required pattern="[0-9]{5}" maxlength="5"
+                                        autocomplete="postal-code">
+                                </div>
+                                <div class="checkout-field">
+                                    <label for="cf_paese">Paese *</label>
+                                    <select id="cf_paese" name="paese" required autocomplete="country">
+                                        <option value="IT" selected>Italia</option>
+                                        <option value="DE">Germania</option>
+                                        <option value="FR">Francia</option>
+                                        <option value="ES">Spagna</option>
+                                        <option value="AT">Austria</option>
+                                        <option value="BE">Belgio</option>
+                                        <option value="NL">Paesi Bassi</option>
+                                        <option value="CH">Svizzera</option>
+                                        <option value="GB">Regno Unito</option>
+                                        <option value="OTHER">Altro paese EU</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="checkout-fieldset">
+                            <legend>Fatturazione (opzionale)</legend>
+                            <div class="checkout-grid">
+                                <div class="checkout-field">
+                                    <label><input type="checkbox" id="cf_fattura"> Richiedo fattura</label>
+                                </div>
+                            </div>
+                            <div class="checkout-grid" id="invoiceFields" style="display:none">
+                                <div class="checkout-field">
+                                    <label for="cf_ragione">Ragione Sociale</label>
+                                    <input type="text" id="cf_ragione" name="ragione_sociale">
+                                </div>
+                                <div class="checkout-field">
+                                    <label for="cf_piva">P.IVA</label>
+                                    <input type="text" id="cf_piva" name="piva" maxlength="11">
+                                </div>
+                                <div class="checkout-field">
+                                    <label for="cf_cf">Codice Fiscale</label>
+                                    <input type="text" id="cf_cf" name="codice_fiscale" maxlength="16">
+                                </div>
+                                <div class="checkout-field">
+                                    <label for="cf_sdi">Codice SDI / PEC</label>
+                                    <input type="text" id="cf_sdi" name="sdi">
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="checkout-fieldset">
+                            <legend>Metodo di Pagamento</legend>
+                            <div class="checkout-payment-options">
+                                <label class="checkout-payment-option">
+                                    <input type="radio" name="pagamento" value="carta" checked>
+                                    <span>&#128179; Carta di Credito / Debito</span>
+                                </label>
+                                <label class="checkout-payment-option">
+                                    <input type="radio" name="pagamento" value="paypal">
+                                    <span>&#128176; PayPal</span>
+                                </label>
+                                <label class="checkout-payment-option">
+                                    <input type="radio" name="pagamento" value="bonifico">
+                                    <span>&#127974; Bonifico Bancario</span>
+                                </label>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="checkout-fieldset">
+                            <legend>Note e Consensi</legend>
+                            <div class="checkout-field checkout-field--full">
+                                <label for="cf_note">Note sull'ordine (opzionale)</label>
+                                <textarea id="cf_note" name="note" rows="3"
+                                    placeholder="Es: consegna al piano, biglietto regalo, orari preferiti..."></textarea>
+                            </div>
+                            <div class="checkout-field checkout-field--full">
+                                <label class="checkout-consent">
+                                    <input type="checkbox" id="cf_privacy" required>
+                                    Ho letto e accetto la <a href="/privacy" target="_blank">Privacy Policy</a> e i <a
+                                        href="/termini" target="_blank">Termini e Condizioni di Vendita</a> *
+                                </label>
+                            </div>
+                        </fieldset>
+
+                        <div class="checkout-actions">
+                            <button type="button" class="checkout-actions__back" id="backToCart">&#8592; Torna al
+                                Carrello</button>
+                            <button type="submit" class="checkout-actions__confirm" id="confirmOrder">Conferma
+                                Ordine</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- CONFERMA ORDINE (nascosto, appare dopo submit) -->
+                <div class="order-confirmed" id="orderConfirmed" style="display:none">
+                    <p class="order-confirmed__icon">&#10003;</p>
+                    <h2 class="order-confirmed__title">Ordine Ricevuto!</h2>
+                    <p class="order-confirmed__text">Grazie per il tuo acquisto. Riceverai un'email di conferma a
+                        <strong id="confirmEmail"></strong> con il riepilogo dell'ordine e le istruzioni per il
+                        pagamento (se hai scelto bonifico bancario).</p>
+                    <p class="order-confirmed__text">Numero ordine: <strong id="confirmOrderId"></strong></p>
+                    <p class="order-confirmed__text">Per qualsiasi domanda, scrivici a <a
+                            href="mailto:info@oleificiocabriolu.it">info@oleificiocabriolu.it</a> o chiamaci al <a
+                            href="tel:+390709311390">+39 070 9311390</a>.</p>
+                    <a href="/" class="order-confirmed__cta">Torna alla Home</a>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        (function () {
+            'use strict';
+
+            /* ─── PRODUCT CATALOG (per lookup nome/prezzo) ─── */
+            var CATALOG = {
+                'evo-puro-0': { name: 'Extravergine Puro', format: '0.25L', price: 7.90, img: '/img/prodotti/product-evo-puro.webp' },
+                'evo-puro-1': { name: 'Extravergine Puro', format: '0.50L', price: 11.00, img: '/img/prodotti/product-evo-puro.webp' },
+                'evo-puro-2': { name: 'Extravergine Puro', format: '0.75L', price: 13.20, img: '/img/prodotti/product-evo-puro.webp' },
+                'evo-puro-3': { name: 'Extravergine Puro', format: 'Latta 3L', price: 38.00, img: '/img/prodotti/product-evo-puro.webp' },
+                'evo-puro-4': { name: 'Extravergine Puro', format: 'Latta 5L', price: 58.00, img: '/img/prodotti/product-evo-puro.webp' },
+                'olio-peperoncino-0': { name: 'Olio al Peperoncino', format: '0.25L', price: 8.90, img: '/img/prodotti/product-olio-peperoncino.webp' },
+                'olio-basilico-0': { name: 'Olio al Basilico', format: '0.25L', price: 8.90, img: '/img/prodotti/product-olio-basilico.webp' },
+                'olio-limone-0': { name: 'Olio al Limone', format: '0.25L', price: 8.90, img: '/img/prodotti/product-olio-limone.webp' },
+                'cofanetto-0': { name: 'Cofanetto Luxury', format: '4×0.25L', price: 34.90, img: '/img/prodotti/product-cofanetto.webp' },
+                'latte-0': { name: 'Latte Professionali', format: 'Latta 3L', price: 38.00, img: '/img/prodotti/product-latte.webp' },
+                'latte-1': { name: 'Latte Professionali', format: 'Latta 5L', price: 58.00, img: '/img/prodotti/product-latte.webp' }
+            };
+
+            /* ─── SHIPPING ─── */
+            var SHIPPING_FREE_THRESHOLD = 59.00;
+            var SHIPPING_IT = 7.90;
+            var SHIPPING_EU = 14.90;
+
+            /* ─── HELPERS ─── */
+            function fmt(n) { return '€' + n.toFixed(2).replace('.', ',') }
+            function getCart() { try { return JSON.parse(localStorage.getItem('cabriolu_cart')) || [] } catch (e) { return [] } }
+            function saveCart(c) { localStorage.setItem('cabriolu_cart', JSON.stringify(c)) }
+            function genOrderId() { return 'CB-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substr(2, 4).toUpperCase() }
+
+            /* ─── DOM ─── */
+            var elEmpty = document.getElementById('cartEmpty');
+            var elFilled = document.getElementById('cartFilled');
+            var elBody = document.getElementById('cartBody');
+            var elSubtotal = document.getElementById('summarySubtotal');
+            var elShipping = document.getElementById('summaryShipping');
+            var elShipNote = document.getElementById('shippingNote');
+            var elTotal = document.getElementById('summaryTotal');
+            var elCheckoutBtn = document.getElementById('checkoutBtn');
+            var elCheckoutForm = document.getElementById('checkoutForm');
+            var elOrderForm = document.getElementById('orderForm');
+            var elBackToCart = document.getElementById('backToCart');
+            var elConfirmed = document.getElementById('orderConfirmed');
+            var elConfirmEmail = document.getElementById('confirmEmail');
+            var elConfirmOrderId = document.getElementById('confirmOrderId');
+            var elFattura = document.getElementById('cf_fattura');
+            var elInvoice = document.getElementById('invoiceFields');
+            var elPaese = document.getElementById('cf_paese');
+
+            /* ─── RENDER CART ─── */
+            function render() {
+                var cart = getCart();
+                if (!cart.length) {
+                    elEmpty.style.display = 'block';
+                    elFilled.style.display = 'none';
+                    return;
+                }
+                elEmpty.style.display = 'none';
+                elFilled.style.display = 'block';
+                elCheckoutForm.style.display = 'none';
+                elConfirmed.style.display = 'none';
+
+                var html = '';
+                var subtotal = 0;
+
+                cart.forEach(function (item, i) {
+                    var cat = CATALOG[item.id] || { name: 'Prodotto', format: '', price: 0, img: '' };
+                    var lineTotal = cat.price * item.qty;
+                    subtotal += lineTotal;
+                    html += '<tr>';
+                    html += '<td class="cart-table__product"><img src="' + cat.img + '" alt="' + cat.name + '" class="cart-table__img" loading="lazy"><span>' + cat.name + '</span></td>';
+                    html += '<td>' + cat.format + '</td>';
+                    html += '<td>' + fmt(cat.price) + '</td>';
+                    html += '<td><div class="cart-table__qty"><button class="cart-table__qty-btn" data-action="minus" data-idx="' + i + '">&#8722;</button><span>' + item.qty + '</span><button class="cart-table__qty-btn" data-action="plus" data-idx="' + i + '">+</button></div></td>';
+                    html += '<td class="cart-table__line-total">' + fmt(lineTotal) + '</td>';
+                    html += '<td><button class="cart-table__remove" data-idx="' + i + '" aria-label="Rimuovi">&#10005;</button></td>';
+                    html += '</tr>';
+                });
+
+                elBody.innerHTML = html;
+                elSubtotal.textContent = fmt(subtotal);
+
+                /* shipping calc */
+                var paese = elPaese ? elPaese.value : 'IT';
+                var shipCost = 0;
+                if (subtotal >= SHIPPING_FREE_THRESHOLD) {
+                    elShipping.textContent = 'Gratuita';
+                    elShipping.style.color = '#4ecb71';
+                    elShipNote.textContent = 'Spedizione gratuita per ordini sopra ' + fmt(SHIPPING_FREE_THRESHOLD) + '!';
+                } else {
+                    shipCost = (paese === 'IT') ? SHIPPING_IT : SHIPPING_EU;
+                    elShipping.textContent = fmt(shipCost);
+                    elShipping.style.color = '';
+                    var remaining = (SHIPPING_FREE_THRESHOLD - subtotal);
+                    elShipNote.textContent = 'Aggiungi ' + fmt(remaining) + ' per la spedizione gratuita.';
+                }
+
+                elTotal.textContent = fmt(subtotal + shipCost);
+
+                /* event delegation for qty buttons and remove */
+                elBody.onclick = function (e) {
+                    var btn = e.target.closest('[data-idx]');
+                    if (!btn) return;
+                    var idx = parseInt(btn.dataset.idx);
+                    var c = getCart();
+                    if (btn.dataset.action === 'minus') {
+                        c[idx].qty = Math.max(1, c[idx].qty - 1);
+                    } else if (btn.dataset.action === 'plus') {
+                        c[idx].qty++;
+                    } else if (btn.classList.contains('cart-table__remove')) {
+                        c.splice(idx, 1);
+                    }
+                    saveCart(c);
+                    render();
+                };
+            }
+
+            /* ─── CHECKOUT FLOW ─── */
+            elCheckoutBtn.addEventListener('click', function () {
+                document.querySelector('.cart-table-wrap').style.display = 'none';
+                document.querySelector('.cart-summary').style.display = 'none';
+                elCheckoutForm.style.display = 'block';
+                elCheckoutForm.scrollIntoView({ behavior: 'smooth' });
+            });
+
+            elBackToCart.addEventListener('click', function () {
+                document.querySelector('.cart-table-wrap').style.display = '';
+                document.querySelector('.cart-summary').style.display = '';
+                elCheckoutForm.style.display = 'none';
+            });
+
+            /* fattura toggle */
+            elFattura.addEventListener('change', function () {
+                elInvoice.style.display = this.checked ? 'grid' : 'none';
+            });
+
+            /* country change → recalc shipping */
+            if (elPaese) { elPaese.addEventListener('change', render) }
+
+            /* form submit */
+            elOrderForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                if (!elOrderForm.checkValidity()) {
+                    elOrderForm.reportValidity();
+                    return;
+                }
+
+                var orderId = genOrderId();
+                var email = document.getElementById('cf_email').value;
+
+                /* In produzione qui si farebbe il POST al backend / gateway di pagamento.
+                   Per ora simuliamo la conferma. */
+
+                elCheckoutForm.style.display = 'none';
+                elConfirmEmail.textContent = email;
+                elConfirmOrderId.textContent = orderId;
+                elConfirmed.style.display = 'block';
+                elConfirmed.scrollIntoView({ behavior: 'smooth' });
+
+                /* svuota carrello */
+                localStorage.removeItem('cabriolu_cart');
+            });
+
+            /* ─── INIT ─── */
+            render();
+
+        })();
+    </script>
+    <script src="/js/common.js" defer></script>
+</body>
+
+</html>
